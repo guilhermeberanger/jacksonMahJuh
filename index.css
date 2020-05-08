@@ -1,24 +1,36 @@
-.layer{
-    font-size: 20px;
-    color: black;
-    background-color: #fdc5a0;
 
 
+
+
+.style>
+*{
+  box-sizing:border-box;
 }
 
-
-.style { font-style: oblique;
-
-color: rgb(207, 248, 21);
-font-size: 40px;
+.left {
+  background-color:#2196F3;
+  padding:20px;
+  float:left;
+  width:20%; /* The width is 20%, by default */
 }
 
-.style { font-size: 50px;
-color: rgb(95, 248, 48);}
+.main {
+  background-color:#f1f1f1;
+  padding:20px;
+  float:left;
+  width:60%; /* The width is 60%, by default */
+}
 
-body { 
-    background-color:#0f0c09 ;;
-margin-left: 150px;
-margin-right: 150px;
-;}   
+.right {
+  background-color:#4CAF50;
+  padding:20px;
+  float:left;
+  width:20%; /* The width is 20%, by default */
+}
 
+/* Use a media query to add a break point at 800px: */
+@media screen and (max-width:800px) {
+  .left, .main, .right {
+    width:100%; /* The width is 100%, when the viewport is 800px or smaller */
+  }
+}
