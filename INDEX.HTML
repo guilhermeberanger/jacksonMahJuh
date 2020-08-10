@@ -1,439 +1,168 @@
-
+<!DOCTYPE html>
 <html>
-  <head>
-  <meta charset="UTF-8">
-  <title>MAH_JUH MODA Masculina</title>
+<head>
+  <title>2° jogo do DEUSDETH</title>
+  <style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
 
- <header>
-   <img src="imagens/Sem título-2.jpg" width="1333">
- </header>
- 
+  body {
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  canvas {
+    border: 1px solid white;
+  }
+  </style>
+</head>
+<body>
+<canvas width="400" height="400" id="game"></canvas>
+<script>
+var canvas = document.getElementById('game');
+var context = canvas.getContext('2d');
 
+var grid = 16;
+var count = 0;
   
- 
-  </head>
+var snake = {
+  x: 160,
+  y: 160,
   
-  <body>
+  // snake velocity. moves one grid length every frame in either the x or y direction
+  dx: grid,
+  dy: 0,
+  
+  // keep track of all grids the snake body occupies
+  cells: [],
+  
+  // length of the snake. grows when eating an apple
+  maxCells: 4
+};
+var apple = {
+  x: 320,
+  y: 320
+};
 
+// get random whole numbers in a specific range
+// @see https://stackoverflow.com/a/1527820/2124254
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 
+// game loop
+function loop() {
+  requestAnimationFrame(loop);
+
+  // slow game loop to 15 fps instead of 60 (60/15 = 4)
+  if (++count < 4) {
+    return;
+  }
+
+  count = 0;
+  context.clearRect(0,0,canvas.width,canvas.height);
+
+  // move snake by it's velocity
+  snake.x += snake.dx;
+  snake.y += snake.dy;
+
+  // wrap snake position horizontally on edge of screen
+  if (snake.x < 0) {
+    snake.x = canvas.width - grid;
+  }
+  else if (snake.x >= canvas.width) {
+    snake.x = 0;
+  }
+  
+  // wrap snake position vertically on edge of screen
+  if (snake.y < 0) {
+    snake.y = canvas.height - grid;
+  }
+  else if (snake.y >= canvas.height) {
+    snake.y = 0;
+  }
+
+  // keep track of where snake has been. front of the array is always the head
+  snake.cells.unshift({x: snake.x, y: snake.y});
+
+  // remove cells as we move away from them
+  if (snake.cells.length > snake.maxCells) {
+    snake.cells.pop();
+  }
+
+  // draw apple
+  context.fillStyle = 'red';
+  context.fillRect(apple.x, apple.y, grid-1, grid-1);
+
+  // draw snake one cell at a time
+  context.fillStyle = 'green';
+  snake.cells.forEach(function(cell, index) {
     
+    // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
+    context.fillRect(cell.x, cell.y, grid-1, grid-1);  
+
+    // snake ate apple
+    if (cell.x === apple.x && cell.y === apple.y) {
+      snake.maxCells++;
+
+      // canvas is 400x400 which is 25x25 grids 
+      apple.x = getRandomInt(0, 25) * grid;
+      apple.y = getRandomInt(0, 25) * grid;
+    }
+
+    // check collision with all cells after this one (modified bubble sort)
+    for (var i = index + 1; i < snake.cells.length; i++) {
+      
+      // snake occupies same space as a body part. reset game
+      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+        snake.x = 160;
+        snake.y = 160;
+        snake.cells = [];
+        snake.maxCells = 4;
+        snake.dx = grid;
+        snake.dy = 0;
+
+        apple.x = getRandomInt(0, 25) * grid;
+        apple.y = getRandomInt(0, 25) * grid;
+      }
+    }
+  });
+}
+
+// listen to keyboard events to move the snake
+document.addEventListener('keydown', function(e) {
+  // prevent snake from backtracking on itself by checking that it's 
+  // not already moving on the same axis (pressing left while moving
+  // left won't do anything, and pressing right while moving left
+  // shouldn't let you collide with your own body)
   
-  <font face="arial">
-  <table border="1" bordercolor="blue" width="100%" height="100%">
-  <tr>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-001.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  
-  
+  // left arrow key
+  if (e.which === 37 && snake.dx === 0) {
+    snake.dx = -grid;
+    snake.dy = 0;
+  }
+  // up arrow key
+  else if (e.which === 38 && snake.dy === 0) {
+    snake.dy = -grid;
+    snake.dx = 0;
+  }
+  // right arrow key
+  else if (e.which === 39 && snake.dx === 0) {
+    snake.dx = grid;
+    snake.dy = 0;
+  }
+  // down arrow key
+  else if (e.which === 40 && snake.dy === 0) {
+    snake.dy = grid;
+    snake.dx = 0;
+  }
+});
 
-  
-  </center>
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-002 149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
- 
-  </center>
-
-  <br>
-  <td>
-  <center>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-003 149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-004 149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-005 149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  </tr>
-  <tr>
-  <td>
-  <center>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-006  149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-007  149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-008  149,90.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-009.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Blusa moleton</u></b><br>
-  <img src="imagens/BL-010.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  </tr>
-  <tr>
-  <td>
-  <center><b><u>CALÇA Tecido </u></b><br>
-  <img src="imagens/calca jeans.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  <br>
-  <td>
-  <center><b><u>CALÇA JEANS</u></b><br>
-  <img src="imagens/calca.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>CALÇA Amarelo</u></b><br>
-  <img src="imagens/calça amarela joelho.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-  <br>
-  <td>
-  <center><b><u>CALÇA JEANS</u></b><br>
-  <img src="imagens/calça camuflada.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-  <br>
-  <td>
-  <center><b><u>Conjunto adidas</u></b><br>
-  <img src="imagens/conjunto feminino rosa.jpg" width="180" height="200"><br>
-  De: <strike>R$ 245,00</strike><br>
-  Por: R$ 210,00<br>
-  3x de 70,00<br><br>
-  <img src="comprar.png">
-  </center>
-
-
-  <br>
-  </tr>
-  <tr>
-  <td>
-  <center><b><u>Corta vento nike</u></b><br>
-  <img src="imagens/corta vento nike.jpg" width="180" height="200"><br>
-  Por: R$ 169,90<br>
-  2x R$ 90,00<br>
-  3x R$ 60,00<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Corta vento nike</b><br>
-  <img src="imagens/corta vento azul.jpg" width="180" height="200"><br>
-  Por: R$ 169,90<br>
-  2x R$ 90,00<br>
-  3x R$ 60,00<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Corta vento blue militar</u></b><br>
-  <img src="imagens/corta vento nike azul.jpg" width="180" height="200"><br>
-  Por: R$ 169,90<br>
-  2x R$ 90,00<br>
-  3x R$ 60,00<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Calça nike preto</u></b><br>
-  <img src="imagens/calça nike preta.jpg" width="180" height="200"><br>
-  Por: R$ 119,90<br>
-  2x R$ 60,00<br>
-  3x R$ 46,00<br>
-  <br><br>
-  </center>
-
-  <br>
-  <td>
-  <center><b><u>Calça jeans fatiada</u></b><br>
-  <img src="imagens/calçca preta rasgada.jpg" width="180" height="200"><br>
-  Por: R$ 149,90<br>
-  2x R$ 77,50<br>
-  3x R$ 55,50<br>
-  4x R$ 45,00<br><br><br>
-  </center>
-
-<br>
-  </tr>
-  <tr>
-  <td>
-    <center><b><u>Bobojaco feminino c/ capuz</u></b><br>
-    <img src="imagens/bobojaco ccapuz (1).jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    
-   </center>
-    <br>
-    <td>
-    <center><b><u>Corta vento nike black</u></b><br>
-    <img src="imagens/bobojaco ccapuz (2).jpg" width="180" height="200"><br>
-    Por: R$ 169,90<br>
-    2x R$ 90,00<br>
-    3x R$ 60,00<br>
-    4x R$ 45,00<br><br><br>
-   
-    </center>
-  
-    <br>
-    <td>
-    <center>
-    <center><b><u>Blusa moleton adidas</u></b><br>
-    <img src="imagens/8d13dd26-f573-451d-8fad-7950b1ce15ed.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Blusa moleton</u></b><br>
-    <img src="imagens/ebbc8801-4ad0-4e04-ac33-98286c6afc7d.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Blusa moleton adidas</u></b><br>
-    <img src="imagens/c7d8bed0-eb09-46a6-a0fd-6c35169bd60c.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    </tr>
-    <tr>
-    <td>
-    <center>
-    <center><b><u>Corta vento feminino</u></b><br>
-    <img src="imagens/ed6107a2-5047-490c-bd0f-6fa1e1ee6337.jpg" width="180" height="200"><br>
-    Por: R$ 169,90<br>
-  2x R$ 90,00<br>
-  3x R$ 60,00<br>
-  4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Blusa moleton</u></b><br>
-    <img src="imagens/e0eda87e-aafa-492f-a66b-037861bf35e8.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Blusa moleton</u></b><br>
-    <img src="imagens/ebbc8801-4ad0-4e04-ac33-98286c6afc7d.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Blusa moleton feminina adidas</u></b><br>
-    <img src="imagens/d844af09-a861-4e9b-b337-6f0c23ea48d2.jpg" width="180" height="200"><br>
-    Por: R$ 110,00<br>
-    2x R$ 60,00<br>
-    3x R$ 45,00<br>
-    4x R$ 35,50<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Corta vento nike </u></b><br>
-    <img src="imagens/corta vento 02.jpg" width="180" height="200"><br>
-    Por: R$ 169,90<br>
-    2x R$ 90,00<br>
-    3x R$ 60,00<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    </tr>
-    <tr>
-    <td>
-    <center><b><u>Blusa Moleton </u></b><br>
-    <img src="imagens/c7d8bed0-eb09-46a6-a0fd-6c35169bd60c.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    <br>
-    <td>
-    <center><b><u>Blusa X</u></b><br>
-    <img src="imagens/blusa X.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    <td>
-    <center><b><u>Bobojaco c/ capuz</u></b><br>
-    <img src="imagens/blusa adidaas moleton (2).jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-    <br>
-    <td>
-    <center><b><u>bobojaco nike gola alta</u></b><br>
-    <img src="imagens/blusa feminina roxa (2).jpg" width="180" height="200"><br>
-    Por: R$ 110,00<br>
-    2x R$ 60,00<br>
-    3x R$ 45,00<br>
-    4x R$ 35,50<br><br><br>
-    </center>
-    <br>
-    <td>
-    <center><b><u>Blusa moleton</u></b><br>
-    <img src="imagens/blusa inerno grafite.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  
-    <br>
-    </tr>
-    <tr>
-    <td>
-    <center><b><u>Blusa moleton</u></b><br>
-    <img src="imagens/blusa inverno adidas bordo.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-    <br>
-    <td>
-    <center><b><u>Blusa moleton</b><br>
-    <img src="imagens/blusa mascvulina marinho.jpg" width="180" height="200"><br>
-    Por: R$ 149,90<br>
-    2x R$ 77,50<br>
-    3x R$ 55,50<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-    <br>
-    <td>
-    <center><b><u>Bobojaco Off </u></b><br>
-    <img src="imagens/11aad563-03cb-404e-b49a-30134c591081.jpg" width="180" height="200"><br>
-    Por: R$ 110,00<br>
-    2x R$ 60,00<br>
-    3x R$ 45,00<br>
-    4x R$ 35,50<br><br><br>
-    </center>
-    <br>
-    <td>
-    <center><b><u>Corta vento black nike</u></b><br>
-    <img src="imagens/7b830b50-33fe-4473-91cf-796a21c9dd77.jpg" width="180" height="200"><br>
-    Por: R$ 169,90<br>
-    2x R$ 90,00<br>
-    3x R$ 60,00<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-    <br>
-    <td>
-    <center><b><u>Bobojaco pink </u></b><br>
-    <img src="imagens/pink bobojaco.jpg" width="180" height="200"><br>
-    Por: R$ 169,90<br>
-    2x R$ 90,00<br>
-    3x R$ 60,00<br>
-    4x R$ 45,00<br><br><br>
-    </center>
-  <br>
-  </tr>
-  </table>
-  </font>
-  </body>
+// start the game
+requestAnimationFrame(loop);
+</script>
+</body>
 </html>
